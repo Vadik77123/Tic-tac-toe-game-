@@ -1,0 +1,134 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class TicTacToe {
+    private static char[][] board = new char[3][3];
+    private static char currentPlayer = 'X';
+    private static boolean gameOver = false;
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        System.out.println("Welcome to Tic-Tac-Toe!");
+        System.out.println("Player X starts the game.");
+        initializeBoard();
+        printBoard();
+        
+        while (!gameOver) {
+            if (currentPlayer == 'X') {
+                playerMove();
+            } else {
+                computerMove();
+            }
+            printBoard();
+            checkWinner();
+            switchPlayer();
+        }
+        System.out.println("Game Over! Thanks for playing!");
+    }
+
+    public static void initializeBoard() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                board[i][j] = '-';
+            }
+        }
+    }
+
+    public static void printBoard() {
+        System.out.println("\nCurrent board:");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void playerMove() {
+        int row, col;
+        while (true) {
+            System.out.println("\nPlayer " + currentPlayer + ", it's your turn!");
+            System.out.println("Please enter your move (row and column, numbers from 0 to 2): ");
+            
+            // Проверка на корректность ввода
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input! Please enter numbers for row and column.");
+                scanner.next();  // Очищаем неверный ввод
+                continue;
+            }
+            
+            row = scanner.nextInt();
+            
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input! Please enter numbers for row and column.");
+                scanner.next();  // Очищаем неверный ввод
+                continue;
+            }
+            
+            col = scanner.nextInt();
+            
+            // Проверка на допустимые индексы
+            if (row < 0 || row >= 3 || col < 0 || col >= 3) {
+                System.out.println("Invalid move! Row and column must be between 0 and 2.");
+            }
+            // Проверка на занятую клетку
+            else if (board[row][col] != '-') {
+                System.out.println("This cell is already occupied! Try again.");
+            }
+            else {
+                board[row][col] = currentPlayer;
+                System.out.println("Great move, Player " + currentPlayer + "!");
+                break;
+            }
+        }
+    }
+
+    public static void computerMove() {
+        Random rand = new Random();
+        int row, col;
+        while (true) {
+            row = rand.nextInt(3);
+            col = rand.nextInt(3);
+            if (board[row][col] == '-') {
+                board[row][col] = currentPlayer;
+                System.out.println("Computer (Player " + currentPlayer + ") played at " + row + " " + col + ".");
+                break;
+            }
+        }
+    }
+
+    public static void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    public static void checkWinner() {
+        for (int i = 0; i < 3; i++) {
+            if ((board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != '-') ||
+                (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != '-')) {
+                gameOver = true;
+                System.out.println("\nPlayer " + currentPlayer + " wins!");
+                return;
+            }
+        }
+        if ((board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != '-') ||
+            (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != '-')) {
+            gameOver = true;
+            System.out.println("\nPlayer " + currentPlayer + " wins!");
+        }
+        if (isBoardFull()) {
+            gameOver = true;
+            System.out.println("\nThe game is a draw!");
+        }
+    }
+
+    public static boolean isBoardFull() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == '-') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
