@@ -117,9 +117,10 @@ public class TicTacToe {
     }
 
     public static int minimaxEvaluate(char[][] board) {
-        if (checkWinner() == 'X') {
+        char winner = checkWinner();
+        if (winner == 'X') {
             return -10;
-        } else if (checkWinner() == 'O') {
+        } else if (winner == 'O') {
             return 10;
         } else {
             return 0; // Ничья или продолжающаяся игра
@@ -130,24 +131,31 @@ public class TicTacToe {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 
-    public static void checkWinner() {
+    // Метод для проверки победителя
+    public static char checkWinner() {
+        // Проверка строк и столбцов
         for (int i = 0; i < 3; i++) {
             if ((board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != '-') ||
                 (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != '-')) {
                 gameOver = true;
-                System.out.println("\nPlayer " + currentPlayer + " wins!");
-                return;
+                return board[i][i]; // Победитель найден
             }
         }
+
+        // Проверка диагоналей
         if ((board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != '-') ||
             (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != '-')) {
             gameOver = true;
-            System.out.println("\nPlayer " + currentPlayer + " wins!");
+            return board[1][1]; // Победитель найден
         }
+
+        // Если доска заполнена и нет победителя
         if (isBoardFull()) {
             gameOver = true;
-            System.out.println("\nThe game is a draw!");
+            return 'D'; // Ничья
         }
+
+        return '-'; // Игра продолжается
     }
 
     public static boolean isBoardFull() {
