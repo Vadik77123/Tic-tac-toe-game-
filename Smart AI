@@ -1,0 +1,163 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class TicTacToe {
+    private static char[][] board = new char[3][3];
+    private static char currentPlayer = 'X';
+    private static boolean gameOver = false;
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        System.out.println("Welcome to Tic-Tac-Toe!");
+        System.out.println("Player X starts the game.");
+        initializeBoard();
+        printBoard();
+
+        while (!gameOver) {
+            if (currentPlayer == 'X') {
+                playerMove();
+            } else {
+                computerMove();
+            }
+            printBoard();
+            checkWinner();
+            switchPlayer();
+        }
+        System.out.println("Game Over! Thanks for playing!");
+    }
+
+    public static void initializeBoard() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                board[i][j] = '-';
+            }
+        }
+    }
+
+    public static void printBoard() {
+        System.out.println("\nCurrent board:");
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    public static void playerMove() {
+        int row, col;
+        while (true) {
+            System.out.println("\nPlayer " + currentPlayer + ", it's your turn!");
+            System.out.println("Please enter your move (row and column, numbers from 0 to 2): ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input! Please enter numbers for row and column.");
+                scanner.next(); // Очистка неверного ввода
+                continue;
+            }
+
+            row = scanner.nextInt();
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input! Please enter numbers for row and column.");
+                scanner.next(); // Очистка неверного ввода
+                continue;
+            }
+
+            col = scanner.nextInt();
+
+            if (row < 0 || row >= 3 || col < 0 || col >= 3) {
+                System.out.println("Invalid move! Row and column must be between 0 and 2.");
+            } else if (board[row][col] != '-') {
+                System.out.println("This cell is already occupied! Try again.");
+            } else {
+                board[row][col] = currentPlayer;
+                System.out.println("Great move, Player " + currentPlayer + "!");
+                break;
+            }
+        }
+    }
+
+    public static void computerMove() {
+        int[] bestMove = minimax(board, 0, true);
+        int row = bestMove[0];
+        int col = bestMove[1];
+        board[row][col] = currentPlayer;
+        System.out.println("Computer (Player " + currentPlayer + ") played at " + row + " " + col + ".");
+    }
+
+    public static int[] minimax(char[][] board, int depth, boolean isMaximizing) {
+        int[] bestMove = {-1, -1};
+        int bestVal = (isMaximizing) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+
+        // Проходим по всем возможным ходам
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == '-') {
+                    board[i][j] = isMaximizing ? 'O' : 'X'; // Игрок или ИИ
+                    int moveVal = minimaxEvaluate(board);
+                    if (isMaximizing) {
+                        if (moveVal > bestVal) {
+                            bestMove[0] = i;
+                            bestMove[1] = j;
+                            bestVal = moveVal;
+                        }
+                    } else {
+                        if (moveVal < bestVal) {
+                            bestMove[0] = i;
+                            bestMove[1] = j;
+                            bestVal = moveVal;
+                        }
+                    }
+                    board[i][j] = '-'; // Отменить ход
+                }
+            }
+        }
+        return bestMove;
+    }
+
+    public static int minimaxEvaluate(char[][] board) {
+        if (checkWinner() == 'X') {
+            return -10;
+        } else if (checkWinner() == 'O') {
+            return 10;
+        } else {
+            return 0; // Ничья или продолжающаяся игра
+        }
+    }
+
+    public static void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    public static void checkWinner() {
+        for (int i = 0; i < 3; i++) {
+            if ((board[i][0] == board[i][1] && board[i][1] == board[i][2] && board[i][0] != '-') ||
+                (board[0][i] == board[1][i] && board[1][i] == board[2][i] && board[0][i] != '-')) {
+                gameOver = true;
+                System.out.println("\nPlayer " + currentPlayer + " wins!");
+                return;
+            }
+        }
+        if ((board[0][0] == board[1][1] && board[1][1] == board[2][2] && board[0][0] != '-') ||
+            (board[0][2] == board[1][1] && board[1][1] == board[2][0] && board[0][2] != '-')) {
+            gameOver = true;
+            System.out.println("\nPlayer " + currentPlayer + " wins!");
+        }
+        if (isBoardFull()) {
+            gameOver = true;
+            System.out.println("\nThe game is a draw!");
+        }
+    }
+
+    public static boolean isBoardFull() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == '-') {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
